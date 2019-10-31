@@ -2,34 +2,50 @@
 #include <fstream>
 using namespace std;
 
-void readEntry( int& entry);
+void readEntry(ifstream& in, int& entry);
 
 int main() {
+    ifstream inFile;
+    ofstream outFile;
 
+    inFile.open("../array");
+    outFile.open("../output");
 
+    if(!inFile.is_open()) {
+        cout << " Could not open file \n";
+        return 1;
+    }
+    int value;
     // read table dimensions and allocate 2D array
     int nRows, nCols;
     cout<<"Enter the number of rows and columns: ";
-    cin >> nRows >> nCols;
+    while ( !inFile.eof() ){
+        inFile >> nRows >> nCols;
+        break;
+    }
+
+    cout << nRows << " " << nCols << endl;
+
     int** table = new int*[nRows];
     for(int i = 0; i < nRows; i++) {
         table[i] = new int[nCols];
     }
 
     // read table data
-    cout<<"Enter your numbers: ";
+    // cout<<"Enter your numbers: ";
     for(int i = 0; i < nRows; i++) {
         for(int j = 0; j < nCols; j++) {
             try {
-              readEntry(table[i][j]);
+              readEntry(inFile, table[i][j]);
             }
             catch (int x) {
                     cout << "Entry " << i << "," << j << " not an integer, was set to " << x << ", now setting it to 0" << endl;
                     table[i][j] = 0;
-                    cin.clear();
+                    inFile.clear();
                     string tmp;
-                    cin >> tmp;
+                    inFile>> tmp;
             }
+            inFile.clear();
         }
     }
 
@@ -38,9 +54,9 @@ int main() {
     cout << nCols << " " << nRows << endl;
     for(int i = 0; i < nCols; i++) {
         for(int j = 0; j < nRows; j++) {
-            cout << table[j][i] << " ";
+            outFile << table[j][i] << " ";
         }
-        cout << endl;
+        outFile << endl;
     }
 
 
@@ -50,12 +66,14 @@ int main() {
     }
     delete [] table;
 
+    inFile.close();
+    outFile.close();
 }
 
-void readEntry( int& entry) {
+void readEntry(ifstream& in, int& entry) {
 
-    cin >> entry;
-    if(cin.fail()) {
+    in >> entry;
+    if(in.fail()) {
         throw entry;
     }
 }
